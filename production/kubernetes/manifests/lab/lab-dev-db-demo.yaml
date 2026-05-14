@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-postgres-secret
+  namespace: mdbs
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: postgres123
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo
+  namespace: mdbs
+spec:
+  clusterIP: None
+  selector:
+    app: demo
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: demo
+  namespace: mdbs
+spec:
+  serviceName: demo
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-postgres-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: lab-dev-db-demo-backup
+              mountPath: /WAL_archive
+            - name: lab-dev-db-demo-extra
+              mountPath: /pg_extra
+      volumes:
+        - name: data
+          hostPath:
+            path: /srv/k8s/postgres/demo-data
+            type: DirectoryOrCreate
+        - name: lab-dev-db-demo-backup
+          nfs:
+            server: 192.168.122.215
+            path: /srv/nfs/current_backup/lab-dev-db-demo
+        - name: lab-dev-db-demo-extra
+          nfs:
+            server: 192.168.122.215
+            path: /srv/nfs/current_pg_extra/scripts/database/configuration/postgresql_conf/template/pg_config

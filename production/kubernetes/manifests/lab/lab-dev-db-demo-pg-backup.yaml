@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lab-dev-db-demo-pg-backup
+  namespace: mdbs
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: busybox
+              command:
+                - sh
+                - -c
+                - echo backup
+              volumeMounts:
+                - name: lab-dev-db-demo-pg-backup-backup
+                  mountPath: /backup
+          volumes:
+            - name: lab-dev-db-demo-pg-backup-backup
+              nfs:
+                server: 192.168.122.215
+                path: /srv/nfs/current_backup/lab-dev-db-demo

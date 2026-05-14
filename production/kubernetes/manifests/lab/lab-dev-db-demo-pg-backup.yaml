@@ -24,4 +24,4 @@ spec:
             - name: lab-dev-db-demo-pg-backup-backup
               nfs:
                 server: 192.168.122.215
-                path: /srv/nfs/current_backup/lab-dev-db-demo
+                path: /vol/dbbackup_vol/lab-dev-db-demo

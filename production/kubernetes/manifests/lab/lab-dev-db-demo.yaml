@@ -64,9 +64,8 @@ spec:
         - name: lab-dev-db-demo-backup
           nfs:
             server: 192.168.122.215
-            path: /vol/dbbackup_vol/lab-dev-db-demo
+            path: /mdbs_backup1/lab-dev-db-demo
         - name: lab-dev-db-demo-extra
           nfs:
             server: 192.168.122.215
-            path: /vol/mdbs_shared/scripts/database/configuration/postgresql_conf/template/pg_config
-
+            path: /mdbs_shared/scripts/database/configuration/postgresql_conf/template/pg_config
